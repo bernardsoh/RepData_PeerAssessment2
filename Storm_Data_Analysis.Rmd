@@ -35,7 +35,6 @@ output:
 
 
 ```{r, echo=TRUE, results='hide'}
-options(tinytex.verbose = TRUE)
 # downloading data
 Url_data <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2FStormData.csv.bz2"
 File_data <- "StormData.csv.bz2"
@@ -57,7 +56,6 @@ Raw_data <- read.csv(file = File_data, header=TRUE, sep=",")
 
 
 ```{r, echo=TRUE, results='hide'}
-options(tinytex.verbose = TRUE)
 # subsetting by date
 Main_data <- Raw_data
 Main_data$BGN_DATE <- strptime(Raw_data$BGN_DATE, "%m/%d/%Y %H:%M:%S")
@@ -73,7 +71,6 @@ Main_data <- subset(Main_data, BGN_DATE > "1995-12-31")
 #### Therefore, we can limit our data to these variables.  
 
 ```{r, echo=TRUE, results='hide'}
-options(tinytex.verbose = TRUE)
 Main_data <- subset(Main_data, select = c(EVTYPE, FATALITIES, INJURIES, PROPDMG, PROPDMGEXP, CROPDMG, CROPDMGEXP))
 ```
 
@@ -94,7 +91,6 @@ CROPDMGEXP - the exponent values for 'CROPDMG' (crop damage)
 #### 3.	There are almost 1000 unique event types in EVTYPE column. Therefore, it is better to limit database to a reasonable number. We can make it by capitalizing all letters in EVTYPE column as well as subsetting only non-zero data regarding our target numbers.  
 
 ```{r, echo=TRUE, results='hide'}
-options(tinytex.verbose = TRUE)
 #cleaning event types names
 Main_data$EVTYPE <- toupper(Main_data$EVTYPE)
 # eliminating zero data
@@ -114,7 +110,6 @@ Main_data <- Main_data[Main_data$FATALITIES !=0 |
 
 
 ```{r, echo = TRUE, results='asis'}
-options(tinytex.verbose = TRUE)
 Health_data <- aggregate(cbind(FATALITIES, INJURIES) ~ EVTYPE, data = Main_data, FUN=sum)
 Health_data$PEOPLE_LOSS <- Health_data$FATALITIES + Health_data$INJURIES
 Health_data <- Health_data[order(Health_data$PEOPLE_LOSS, decreasing = TRUE), ]
@@ -140,7 +135,6 @@ knitr::kable(Top10_events_people, format = "markdown")
 #### We transform letters and symbols to numbers:
 
 ```{r, echo=TRUE, results = 'hide'}
-options(tinytex.verbose = TRUE)
 Main_data$PROPDMGEXP <- gsub("[Hh]", "2", Main_data$PROPDMGEXP)
 Main_data$PROPDMGEXP <- gsub("[Kk]", "3", Main_data$PROPDMGEXP)
 Main_data$PROPDMGEXP <- gsub("[Mm]", "6", Main_data$PROPDMGEXP)
@@ -165,7 +159,6 @@ Main_data$CROPDMGEXP[is.na(Main_data$CROPDMGEXP)] <- 0
 #### At last, we create new values of total property damage and total crop damage for analysis (we need ‘dplr’ package for that).  
 
 ```{r, echo=TRUE, results = 'hide', message = FALSE, warning = FALSE}
-options(tinytex.verbose = TRUE)
 #creating total damage values
 library(dplyr)
 Main_data <- mutate(Main_data, 
@@ -178,7 +171,6 @@ Main_data <- mutate(Main_data,
 #### Now we aggregate property and crop damage numbers in order to identify TOP-10 events contributing the total economic loss:
 
 ```{r, echo=TRUE, results = 'asis'}
-options(tinytex.verbose = TRUE)
 Economic_data <- aggregate(cbind(PROPDMGTOTAL, CROPDMGTOTAL) ~ EVTYPE, data = Main_data, FUN=sum)
 Economic_data$ECONOMIC_LOSS <- Economic_data$PROPDMGTOTAL + Economic_data$CROPDMGTOTAL
 Economic_data <- Economic_data[order(Economic_data$ECONOMIC_LOSS, decreasing = TRUE), ]
@@ -195,7 +187,6 @@ knitr::kable(Top10_events_economy, format = "markdown")
   
 
 ```{r, echo=TRUE, results='asis', message = FALSE, warning = FALSE}
-options(tinytex.verbose = TRUE)
 #plotting health loss
 library(ggplot2)
 g <- ggplot(data = Top10_events_people, aes(x = reorder(EVTYPE, PEOPLE_LOSS), y = PEOPLE_LOSS))
@@ -212,7 +203,6 @@ print(g)
 #### Analyzing economic impact on the graph one can conclude that FLOOD, HURRICANE/TYPHOON and STORM SURGE are the main contributors to severe economic consequences out of all event types of weather events. 
 
 ```{r, echo=TRUE, results='asis'}
-options(tinytex.verbose = TRUE)
 #plotting economic loss
 g <- ggplot(data = Top10_events_economy, aes(x = reorder(EVTYPE, ECONOMIC_LOSS), y = ECONOMIC_LOSS))
 g <- g + geom_bar(stat = "identity", colour = "black")
